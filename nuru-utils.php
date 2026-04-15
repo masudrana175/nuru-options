@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
  * @return array An array of WP_Post objects, or empty array if none found.
  */
 function get_nuru_slot_day_data($location, $timeslot, $day_index) {
-    $valid_locations = array('montreal', 'laval');
+    $valid_locations = array('montreal', 'laval', 'nuru_vip');
     $valid_timeslots = array('10am_3pm', '10am_7pm', '3pm_9pm', '7pm_11pm', '9pm_5am');
     $valid_day_indices = range(0, 6);
 
@@ -70,7 +70,7 @@ function get_nuru_slot_day_data($location, $timeslot, $day_index) {
  * @return array An array of WP_Post objects, or empty array if none found.
  */
 function get_nuru_who_on_now_data($location, $timeslot) {
-    $valid_locations = array('montreal', 'laval');
+    $valid_locations = array('montreal', 'laval', 'nuru_vip');
     $valid_timeslots = array('10am_3pm', '10am_7pm', '3pm_9pm', '7pm_11pm', '9pm_5am');
 
     if (!in_array($location, $valid_locations) ||
