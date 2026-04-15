@@ -1,0 +1,239 @@
+/* General styling for the Nuru Options page */
+.nuru-options-wrap {
+	margin-right: auto;
+	margin-left: auto;
+	padding-right: 30px;
+} 
+.form-table tr:has(.nuru-days-grid) th {
+	display: none; /* Hide default th for grid sections */
+}
+/* Styling for each location section */
+.nuru-options-wrap h2 {
+	border-bottom: 1px solid #ccc;
+	padding-bottom: 10px;
+	margin-bottom: 20px;
+}
+
+/* Sections for Montreal and Laval */
+#nuru_options_section_montreal,
+#nuru_options_section_laval {
+	background: #f9f9f9;
+	border: 1px solid #e5e5e5;
+	padding: 15px 20px;
+	margin-bottom: 30px;
+	box-shadow: 0 1px 1px rgba(0,0,0,.04);
+	border-radius: 5px;
+}
+#nuru_options_section_montreal > h3, /* Target the section title directly */
+#nuru_options_section_laval > h3 {
+	color: #23282d;
+	font-size: 1.8em;
+	margin-top: 0;
+	margin-bottom: 15px;
+	padding-bottom: 10px;
+	border-bottom: 1px solid #eee;
+}
+.form-table tr:has(.nuru-slot-item) th {
+    display: none;
+}
+.whos-row a.whos-col .whothumbnail-image {
+    height: 540px;
+    overflow: hidden;
+}
+/* Styling for the slot titles (e.g., "Slot: 10am to 3pm") */
+.nuru-slot-title {
+	background-color: #eaf2fa; /* Light blue background */
+	padding: 8px 15px;
+	margin: 25px 0 15px 0; /* More space above and below */
+	border-left: 5px solid #007cba; /* Blue left border */
+	font-size: 1.2em;
+	color: #007cba;
+	border-radius: 3px;
+	clear: both; /* Ensures it's on its own line */
+}
+
+/* --- Grid Styling --- */
+.nuru-days-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* 3 columns, responsive */
+	gap: 20px; /* Space between grid items */
+	margin-bottom: 20px;
+}
+
+.nuru-day-item {
+	background: #fff;
+	border: 1px solid #e5e5e5;
+	padding: 15px;
+	border-radius: 4px;
+	box-shadow: 0 1px 1px rgba(0,0,0,.02);
+}
+.nuru-day-item h4 {
+	margin-top: 0;
+	margin-bottom: 10px;
+	color: #007cba;
+	font-size: 1.1em;
+	border-bottom: 1px dashed #eee;
+	padding-bottom: 5px;
+}
+
+/* Adjust submit button margin */
+p.submit {
+	margin-top: 30px;
+}
+
+/* Hide default form-table structure for fields using the custom grid */
+.form-table tr th,
+.form-table tr td {
+	padding: 0; /* Remove default padding */
+	vertical-align: top;
+	border: none; /* Remove default borders */
+}
+.form-table tr {
+	border: none;
+}
+/* Specifically target the tr for our group field to remove default spacing */
+.form-table tr:has(.nuru-days-grid) {
+	padding-top: 0;
+	padding-bottom: 0;
+}
+.form-table tr:has(.nuru-days-grid) th {
+	width: auto; /* Allow the slot title to take natural width */
+	padding-right: 0;
+}
+/* Styling for fields that are not part of a grid (like Who's on Now slot items) */
+.form-table tr:has(.nuru-slot-item) th {
+	width: 300px; /* Give a reasonable width to the label */
+	padding: 10px 10px 10px 0;
+	vertical-align: middle;
+}
+.form-table tr:has(.nuru-slot-item) td {
+	padding: 10px 0;
+	vertical-align: middle;
+}
+
+
+/* Select2 specific styling adjustments for integration */
+.select2-container--default .select2-selection--multiple {
+	border: 1px solid #c3c4c7; /* Match WP admin field borders */
+	border-radius: 4px;
+	min-height: 30px; /* Standard WP field height */
+	padding: 1px 4px;
+	background-color: #fff;
+}
+.select2-container--default.select2-container--focus .select2-selection--multiple {
+	border-color: #7c8388; /* Focus border */
+	box-shadow: 0 0 0 1px #7c8388;
+}
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+	background-color: #eaf2fa;
+	border: 1px solid #007cba;
+	border-radius: 3px;
+	padding: 0 5px;
+	margin-top: 4px;
+}
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+	color: #007cba;
+}
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+	background-color: #007cba;
+	color: #fff;
+}
+/* Adjust width for better fit in grid */
+.nuru-day-item .select2-container,
+.nuru-slot-item .select2-container {
+	width: 100% !important;
+}
+
+/* All CSS is largely similar to schedule page for consistency */
+            /* General styling for the Nuru Options page */
+.nuru-options-wrap {
+	margin-right: auto;
+	margin-left: auto;
+	padding-right: 30px;
+}
+/* Hide default th for grid sections (not used here, but for consistency if reused) */
+.form-table tr:has(.nuru-days-grid) th {
+	display: none;
+}
+/* Styling for each location section */
+.nuru-options-wrap h2 {
+	border-bottom: 1px solid #ccc;
+	padding-bottom: 10px;
+	margin-bottom: 20px;
+}
+
+/* Sections for Montreal and Laval */
+#nuru_who_on_now_section_montreal,
+#nuru_who_on_now_section_laval {
+	background: #f9f9f9;
+	border: 1px solid #e5e5e5;
+	padding: 15px 20px;
+	margin-bottom: 30px;
+	box-shadow: 0 1px 1px rgba(0,0,0,.04);
+	border-radius: 5px;
+}
+#nuru_who_on_now_section_montreal > h3,
+#nuru_who_on_now_section_laval > h3 {
+	color: #23282d;
+	font-size: 1.8em;
+	margin-top: 0;
+	margin-bottom: 15px;
+	padding-bottom: 10px;
+	border-bottom: 1px solid #eee;
+}
+
+/* Styling for the slot titles (e.g., "Slot: 10am to 3pm") */
+/* For Who's on Now, these are the individual field labels, not separate titles */
+.nuru-slot-item strong { 
+	display: block;
+	margin-bottom: 5px;
+	color: #007cba;
+	font-size: 1.1em;
+}
+
+/* Adjust submit button margin */
+p.submit {
+	margin-top: 30px;
+}
+
+/* Basic form-table adjustments for consistency */
+.form-table tr th {
+	width: 300px; /* Adjust label width as needed */
+	padding: 10px 10px 10px 0;
+	vertical-align: middle;
+}
+.form-table tr td {
+	padding: 10px 0;
+	vertical-align: middle;
+}
+
+/* Select2 specific styling adjustments for integration */
+.select2-container--default .select2-selection--multiple {
+	border: 1px solid #c3c4c7; /* Match WP admin field borders */
+	border-radius: 4px;
+	min-height: 30px; /* Standard WP field height */
+	padding: 1px 4px;
+	background-color: #fff;
+}
+.select2-container--default.select2-container--focus .select2-selection--multiple {
+	border-color: #7c8388; /* Focus border */
+	box-shadow: 0 0 0 1px #7c8388;
+}
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+	background-color: #eaf2fa;
+	border: 1px solid #007cba;
+	border-radius: 3px;
+	padding: 0 5px;
+	margin-top: 4px;
+}
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+	color: #007cba;
+}
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+	background-color: #007cba;
+	color: #fff;
+}
+/* Adjust width for better fit */
+.nuru-slot-item .select2-container {
+	width: 100% !important;
+}
