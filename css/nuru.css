@@ -423,7 +423,7 @@
 .nuru-select-wrap .select2-container {
     width: 100% !important;
 }
-.nuru-select2-dropdown .select2-results__option {
+.select2-dropdown .select2-results__option {
     font-size: .9em;
     padding: 6px 10px;
 }
