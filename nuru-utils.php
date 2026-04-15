@@ -3,20 +3,15 @@
 // Utility functions for Nuru Options plugin
 
 if (!defined('ABSPATH')) {
-    exit; // Exit if accessed directly
+    exit;
 }
 
 /**
- * Retrieves goddess posts for a specific location, timeslot, and day from the Schedule settings.
- *
- * @param string $location   'montreal' or 'laval'.
- * @param string $timeslot   e.g., '10am_3pm'.
- * @param int    $day_index  0-6 for Day 1 to Day 7.
- * @return array An array of WP_Post objects, or empty array if none found.
+ * Retrieves goddess post IDs for a specific location, timeslot, and day (Schedule).
  */
 function get_nuru_slot_day_data($location, $timeslot, $day_index) {
-    $valid_locations = array('montreal', 'laval', 'nuru_vip');
-    $valid_timeslots = array('10am_3pm', '10am_7pm', '3pm_9pm', '7pm_11pm', '9pm_5am');
+    $valid_locations   = array('montreal', 'laval', 'nuru_vip');
+    $valid_timeslots   = array('10am_3pm', '10am_7pm', '3pm_9pm', '7pm_11pm', '9pm_5am');
     $valid_day_indices = range(0, 6);
 
     if (!in_array($location, $valid_locations) ||
@@ -26,48 +21,26 @@ function get_nuru_slot_day_data($location, $timeslot, $day_index) {
         return array();
     }
 
-    $options = get_option('nuru_options_settings'); // Fetches from Schedule settings
+    $options  = get_option('nuru_options_settings');
     $field_id = "{$location}_{$timeslot}_day{$day_index}";
 
-    $stored_data = isset($options[$field_id]) ? $options[$field_id] : '';
+    $stored_data       = isset($options[$field_id]) ? $options[$field_id] : '';
     $selected_ids_array = array();
 
-    if (is_array($stored_data)) { // Legacy array of lines/IDs
+    if (is_array($stored_data)) {
         foreach ($stored_data as $item) {
             $id = absint(trim($item));
-            if ($id > 0) {
-                $selected_ids_array[] = $id;
-            }
+            if ($id > 0) { $selected_ids_array[] = $id; }
         }
-    } elseif (is_string($stored_data) && !empty($stored_data)) { // Current comma-separated string of IDs
+    } elseif (is_string($stored_data) && !empty($stored_data)) {
         $selected_ids_array = array_filter(array_map('absint', explode(',', $stored_data)));
     }
 
-    $selected_ids_array = array_unique($selected_ids_array);
-
-    if (empty($selected_ids_array)) {
-        return array();
-    }
-
-   /* $posts = get_posts(array(
-        'post_type'      => 'goddess',
-        'post__in'       => $selected_ids_array,
-        'posts_per_page' => -1,
-        'orderby'        => 'post__in',
-        'suppress_filters' => true,
-    ));
-	*/
-
-    return $selected_ids_array; // Returns an array of WP_Post objects
+    return array_unique($selected_ids_array);
 }
 
 /**
- * Retrieves goddess posts for a specific location and timeslot from the "Who's on Now" settings.
- * This version does NOT include day indexing.
- *
- * @param string $location 'montreal' or 'laval'.
- * @param string $timeslot e.g., '10am_3pm'.
- * @return array An array of WP_Post objects, or empty array if none found.
+ * Retrieves goddess post IDs for a specific location and timeslot (Who's on Now).
  */
 function get_nuru_who_on_now_data($location, $timeslot) {
     $valid_locations = array('montreal', 'laval', 'nuru_vip');
@@ -79,127 +52,122 @@ function get_nuru_who_on_now_data($location, $timeslot) {
         return array();
     }
 
-    $options = get_option('nuru_who_on_now_settings'); // Fetches from Who's on Now settings
-    // The field ID structure here is `location_timeslot` (no _dayX)
+    $options  = get_option('nuru_who_on_now_settings');
     $field_id = "{$location}_{$timeslot}";
 
-    $stored_data = isset($options[$field_id]) ? $options[$field_id] : '';
+    $stored_data        = isset($options[$field_id]) ? $options[$field_id] : '';
     $selected_ids_array = array();
 
     if (is_string($stored_data) && !empty($stored_data)) {
         $selected_ids_array = array_filter(array_map('absint', explode(',', $stored_data)));
-    } elseif (is_array($stored_data)) { // Handle potential legacy arrays during transition if structure ever changed
+    } elseif (is_array($stored_data)) {
         foreach ($stored_data as $item) {
             $id = absint(trim($item));
-            if ($id > 0) {
-                $selected_ids_array[] = $id;
-            }
+            if ($id > 0) { $selected_ids_array[] = $id; }
         }
     }
 
-    $selected_ids_array = array_unique($selected_ids_array);
-
-    if (empty($selected_ids_array)) {
-        return array();
-    }
-
-   /* $posts = get_posts(array(
-        'post_type'      => 'goddess',
-        'post__in'       => $selected_ids_array,
-        'posts_per_page' => -1,
-        'orderby'        => 'post__in',
-        'suppress_filters' => true,
-    ));
-*/
-    return $selected_ids_array; // Returns an array of WP_Post objects
+    return array_unique($selected_ids_array);
 }
 
 /**
- * Custom Callback to render Select2 fields for goddess posts.
- * This function is generic and can be used for both single-day and multi-day selections.
+ * Renders a Select2 multi-select field.
  *
- * @param array $args Arguments for the field, including 'option_name', 'location', 'slot_slug', 'slot_display', and optionally 'day_index'.
+ * When 'day_index' is present in $args  → renders a day item (inside schedule grid).
+ * When 'day_index' is absent            → renders a collapsible slot item (Who's on Now).
  */
 function nuru_options_select2_field_callback($args) {
-    $option_name = $args['option_name'];
-    $options = get_option($option_name);
-    $location = $args['location'];
-    $slot_slug = $args['slot_slug'];
-    $slot_display = $args['slot_display'];
-    
-    // Construct field_id based on whether it includes a day or not
+    $option_name      = $args['option_name'];
+    $options          = get_option($option_name);
+    $location         = $args['location'];
+    $slot_slug        = $args['slot_slug'];
+    $slot_display     = $args['slot_display'];
     $day_index_present = isset($args['day_index']);
+
     if ($day_index_present) {
-        $day_index = $args['day_index'];
-        $field_id = "{$location}_{$slot_slug}_day{$day_index}";
-        $label_text = $args['day_name']; // Get day name from args
+        $day_index  = $args['day_index'];
+        $field_id   = "{$location}_{$slot_slug}_day{$day_index}";
+        $label_text = $args['day_name'];
     } else {
-        $field_id = "{$location}_{$slot_slug}";
-        $label_text = $slot_display; // Label is just the slot display if no day
+        $field_id   = "{$location}_{$slot_slug}";
+        $label_text = $slot_display;
     }
-    
-    // Get stored data and convert to array
-    $stored_data = isset($options[$field_id]) ? $options[$field_id] : '';
+
+    // Resolve stored selections
+    $stored_data        = isset($options[$field_id]) ? $options[$field_id] : '';
     $selected_ids_array = array();
     if (is_array($stored_data)) {
         $selected_ids_array = array_filter(array_map('absint', $stored_data));
     } elseif (is_string($stored_data)) {
         $selected_ids_array = array_filter(array_map('absint', explode(',', $stored_data)));
     }
-    
-    // Fetch ALL posts of type 'goddess'
+
+    // Build options list
     $all_posts = get_posts(array(
-        'post_type'      => 'goddess',
-        'posts_per_page' => -1,
-        'orderby'        => 'title',
-        'order'          => 'ASC',
+        'post_type'        => 'goddess',
+        'posts_per_page'   => -1,
+        'orderby'          => 'title',
+        'order'            => 'ASC',
         'suppress_filters' => true,
     ));
-    
-    // Build options array with all posts, marking selected ones
+
     $all_options = array();
-    if (!empty($all_posts)) {
-        foreach ($all_posts as $post) {
-            $is_selected = in_array($post->ID, $selected_ids_array);
-            $all_options[] = array(
-                'id'       => $post->ID,
-                'text'     => get_the_title($post->ID) . ' (ID: ' . $post->ID . ')',
-                'selected' => $is_selected
-            );
-        }
+    foreach ($all_posts as $post) {
+        $all_options[] = array(
+            'id'       => $post->ID,
+            'text'     => get_the_title($post->ID) . ' (ID: ' . $post->ID . ')',
+            'selected' => in_array($post->ID, $selected_ids_array),
+        );
     }
-    
-    $all_options_json = esc_attr(json_encode($all_options));
-    $current_value_string = implode(',', $selected_ids_array);
-    ?>
-    <div class="nuru-select2-item <?php echo $day_index_present ? 'nuru-day-item' : 'nuru-slot-item'; ?>">
-        <label for="<?php echo esc_attr($field_id); ?>">
-            <?php if ($day_index_present) : ?>
-                <h4><?php echo esc_html($label_text); ?></h4>
-            <?php else : ?>
-                <strong><?php echo esc_html($label_text); ?></strong>
-            <?php endif; ?>
-        </label>
-        <select
-            id="<?php echo esc_attr($field_id); ?>"
-            name="<?php echo esc_attr($option_name); ?>[<?php echo esc_attr($field_id); ?>][]"
-            class="nuru-post-select2"
-            style="width: 100%;"
-            multiple="multiple"
-            data-initial-options="<?php echo $all_options_json; ?>"
-        >
-            <?php
-            // Render all options with selected attribute for selected items
-            if (!empty($all_options)) {
-                foreach ($all_options as $option) {
-                    $selected_attr = $option['selected'] ? ' selected' : '';
-                    echo '<option value="' . esc_attr($option['id']) . '"' . $selected_attr . '>'
-                        . esc_html($option['text']) .
-                    '</option>';
-                }
-            }
-            ?>
-        </select>
-    </div>
-    <?php
+
+    $name_attr = esc_attr($option_name) . '[' . esc_attr($field_id) . '][]';
+    $id_attr   = esc_attr($field_id);
+
+    if ($day_index_present) {
+        // ---- Schedule day cell ----
+        ?>
+        <div class="nuru-day-item">
+            <h4><?php echo esc_html($label_text); ?></h4>
+            <select id="<?php echo $id_attr; ?>" name="<?php echo $name_attr; ?>"
+                    class="nuru-post-select2" style="width:100%;" multiple="multiple">
+                <?php foreach ($all_options as $opt): ?>
+                    <option value="<?php echo esc_attr($opt['id']); ?>"<?php echo $opt['selected'] ? ' selected' : ''; ?>>
+                        <?php echo esc_html($opt['text']); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <?php
+    } else {
+        // ---- Who's on Now slot — collapsible ----
+        $has_selection = !empty($selected_ids_array);
+        $open_class    = $has_selection ? ' is-open' : '';
+        $body_style    = $has_selection ? '' : ' style="display:none;"';
+        ?>
+        <div class="nuru-slot-item nuru-collapsible">
+            <button type="button" class="nuru-collapsible-header<?php echo $open_class; ?>">
+                <span class="nuru-slot-label">
+                    <span class="dashicons dashicons-clock nuru-slot-icon"></span>
+                    <?php echo esc_html($slot_display); ?>
+                    <?php if ($has_selection): ?>
+                        <span class="nuru-badge"><?php echo count($selected_ids_array); ?></span>
+                    <?php endif; ?>
+                </span>
+                <span class="nuru-chevron dashicons dashicons-arrow-down-alt2"></span>
+            </button>
+            <div class="nuru-collapsible-body"<?php echo $body_style; ?>>
+                <div class="nuru-select-wrap">
+                    <select id="<?php echo $id_attr; ?>" name="<?php echo $name_attr; ?>"
+                            class="nuru-post-select2" style="width:100%;" multiple="multiple">
+                        <?php foreach ($all_options as $opt): ?>
+                            <option value="<?php echo esc_attr($opt['id']); ?>"<?php echo $opt['selected'] ? ' selected' : ''; ?>>
+                                <?php echo esc_html($opt['text']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <?php
+    }
 }
