@@ -25,7 +25,7 @@ function nuru_options_enqueue_admin_scripts($hook) {
     }
 
     wp_enqueue_style('select2', plugin_dir_url(__FILE__) . 'css/select2.min.css', array(), '4.0.13');
-    wp_enqueue_script('select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js', array('jquery'), '4.0.0', true);
+    wp_enqueue_script('select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js', array('jquery'), '4.0.13', true);
 
     // Fetch goddess posts for Select2 options
     $posts = get_posts(array(

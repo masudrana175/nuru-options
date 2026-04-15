@@ -10,10 +10,9 @@ jQuery(function ($) {
         $('.nuru-post-select2').each(function () {
             if (!$(this).hasClass('select2-hidden-accessible')) {
                 $(this).select2({
-                    placeholder:  '— Select goddesses —',
-                    allowClear:   true,
-                    width:        '100%',
-                    dropdownCssClass: 'nuru-select2-dropdown',
+                    placeholder: '— Select goddesses —',
+                    allowClear:  true,
+                    width:       '100%',
                 });
             }
         });
