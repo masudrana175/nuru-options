@@ -47,25 +47,16 @@ function nuru_schedule_days_group_callback($args) {
     $slot_display = $args['slot_display'];
     $days_labels  = array('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday');
 
-    // Check if any day in this slot has saved selections (auto-open if so)
-    $option_data = get_option('nuru_options_settings', array());
-    $has_data    = false;
-    foreach (array_keys($days_labels) as $day_index) {
-        $fid = $args['location'] . '_' . $args['slot_slug'] . '_day' . $day_index;
-        if (!empty($option_data[$fid])) { $has_data = true; break; }
-    }
-    $open_class = $has_data ? ' is-open' : '';
-    $body_style = $has_data ? '' : ' style="display:none;"';
     ?>
     <div class="nuru-collapsible">
-        <button type="button" class="nuru-collapsible-header<?php echo $open_class; ?>">
+        <button type="button" class="nuru-collapsible-header">
             <span class="nuru-slot-label">
                 <span class="dashicons dashicons-clock nuru-slot-icon"></span>
                 <?php echo esc_html($slot_display); ?>
             </span>
             <span class="nuru-chevron dashicons dashicons-arrow-down-alt2"></span>
         </button>
-        <div class="nuru-collapsible-body"<?php echo $body_style; ?>>
+        <div class="nuru-collapsible-body" style="display:none;">
             <div class="nuru-days-grid">
                 <?php
                 foreach ($days_labels as $day_index => $day_name) {

@@ -140,12 +140,9 @@ function nuru_options_select2_field_callback($args) {
         <?php
     } else {
         // ---- Who's on Now slot — collapsible ----
-        $has_selection = !empty($selected_ids_array);
-        $open_class    = $has_selection ? ' is-open' : '';
-        $body_style    = $has_selection ? '' : ' style="display:none;"';
         ?>
         <div class="nuru-slot-item nuru-collapsible">
-            <button type="button" class="nuru-collapsible-header<?php echo $open_class; ?>">
+            <button type="button" class="nuru-collapsible-header">
                 <span class="nuru-slot-label">
                     <span class="dashicons dashicons-clock nuru-slot-icon"></span>
                     <?php echo esc_html($slot_display); ?>
@@ -155,7 +152,7 @@ function nuru_options_select2_field_callback($args) {
                 </span>
                 <span class="nuru-chevron dashicons dashicons-arrow-down-alt2"></span>
             </button>
-            <div class="nuru-collapsible-body"<?php echo $body_style; ?>>
+            <div class="nuru-collapsible-body" style="display:none;">
                 <div class="nuru-select-wrap">
                     <select id="<?php echo $id_attr; ?>" name="<?php echo $name_attr; ?>"
                             class="nuru-post-select2" style="width:100%;" multiple="multiple">
