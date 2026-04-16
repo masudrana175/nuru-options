@@ -429,6 +429,28 @@
 }
 
 /* ============================================================
+   VIP Exclusive Goddesses card
+   ============================================================ */
+.nuru-vip-exclusive-card .nuru-location-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.nuru-vip-star {
+    color: var(--nuru-gold-dark);
+    font-size: 1em;
+    width: 1em;
+    height: 1em;
+    flex-shrink: 0;
+}
+.nuru-vip-exclusive-body {
+    padding-top: 16px;
+}
+.nuru-vip-exclusive-field .select2-container {
+    width: 100% !important;
+}
+
+/* ============================================================
    Responsive
    ============================================================ */
 @media screen and (max-width: 1024px) {

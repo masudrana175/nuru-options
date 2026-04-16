@@ -71,6 +71,21 @@ function get_nuru_who_on_now_data($location, $timeslot) {
 }
 
 /**
+ * Retrieves goddess post IDs from the VIP Exclusive Goddesses field.
+ *
+ * @return int[] Array of post IDs.
+ */
+function get_nuru_vip_exclusive_data() {
+    $options     = get_option('nuru_options_settings', array());
+    $stored_data = isset($options['nuru_vip_exclusive']) ? $options['nuru_vip_exclusive'] : '';
+
+    if (is_string($stored_data) && !empty($stored_data)) {
+        return array_unique(array_filter(array_map('absint', explode(',', $stored_data))));
+    }
+    return array();
+}
+
+/**
  * Renders a Select2 multi-select field.
  *
  * When 'day_index' is present in $args  → renders a day item (inside schedule grid).

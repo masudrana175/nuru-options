@@ -16,9 +16,10 @@ function nuru_schedule_settings_init() {
         'capability'        => 'edit_pages',
     ));
 
-    add_settings_section('nuru_options_section_montreal', '', '__return_false', 'nuru-options');
-    add_settings_section('nuru_options_section_laval',    '', '__return_false', 'nuru-options');
-    add_settings_section('nuru_options_section_nuru_vip', '', '__return_false', 'nuru-options');
+    add_settings_section('nuru_options_section_montreal',     '', '__return_false', 'nuru-options');
+    add_settings_section('nuru_options_section_laval',        '', '__return_false', 'nuru-options');
+    add_settings_section('nuru_options_section_nuru_vip',     '', '__return_false', 'nuru-options');
+    add_settings_section('nuru_options_section_vip_exclusive','', '__return_false', 'nuru-options');
 
     foreach ($locations as $location) {
         foreach ($slots as $slot_slug) {
@@ -38,6 +39,16 @@ function nuru_schedule_settings_init() {
             );
         }
     }
+
+    // VIP Exclusive single field
+    add_settings_field(
+        'nuru_vip_exclusive',
+        'VIP Exclusive Goddesses',
+        'nuru_vip_exclusive_field_callback',
+        'nuru-options',
+        'nuru_options_section_vip_exclusive',
+        array('option_name' => 'nuru_options_settings')
+    );
 }
 
 /**
@@ -47,9 +58,9 @@ function nuru_schedule_days_group_callback($args) {
     $slot_display = $args['slot_display'];
     $days_labels  = array('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday');
 
-    // Count total unique goddess selections across all 7 days for this slot
-    $option_data   = get_option('nuru_options_settings', array());
-    $total_count   = 0;
+    // Count total goddess assignments across all 7 days for this slot
+    $option_data = get_option('nuru_options_settings', array());
+    $total_count = 0;
     foreach (array_keys($days_labels) as $day_index) {
         $fid = $args['location'] . '_' . $args['slot_slug'] . '_day' . $day_index;
         if (!empty($option_data[$fid])) {
@@ -85,6 +96,48 @@ function nuru_schedule_days_group_callback($args) {
 }
 
 /**
+ * Renders the VIP Exclusive Goddesses single multi-select field.
+ */
+function nuru_vip_exclusive_field_callback($args) {
+    $option_name  = $args['option_name'];
+    $options      = get_option($option_name, array());
+    $field_id     = 'nuru_vip_exclusive';
+    $stored_data  = isset($options[$field_id]) ? $options[$field_id] : '';
+
+    $selected_ids = array();
+    if (is_string($stored_data) && !empty($stored_data)) {
+        $selected_ids = array_filter(array_map('absint', explode(',', $stored_data)));
+    }
+
+    $all_posts = get_posts(array(
+        'post_type'        => 'goddess',
+        'posts_per_page'   => -1,
+        'orderby'          => 'title',
+        'order'            => 'ASC',
+        'suppress_filters' => true,
+    ));
+    ?>
+    <div class="nuru-vip-exclusive-field">
+        <select id="<?php echo esc_attr($field_id); ?>"
+                name="<?php echo esc_attr($option_name); ?>[<?php echo esc_attr($field_id); ?>][]"
+                class="nuru-post-select2"
+                style="width:100%;"
+                multiple="multiple">
+            <?php foreach ($all_posts as $post): ?>
+                <option value="<?php echo esc_attr($post->ID); ?>"
+                        <?php echo in_array($post->ID, $selected_ids) ? 'selected' : ''; ?>>
+                    <?php echo esc_html(get_the_title($post->ID)) . ' (ID: ' . $post->ID . ')'; ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+        <p class="description" style="margin-top:8px;">
+            These Goddesses are exclusive to Nuru VIP and will appear separately from the regular schedule.
+        </p>
+    </div>
+    <?php
+}
+
+/**
  * Renders the Schedule admin page.
  */
 function nuru_schedule_page_content() {
@@ -111,6 +164,14 @@ function nuru_schedule_page_content() {
             'css'     => 'nuru-loc-vip',
         ),
     );
+
+    // Pre-compute VIP Exclusive badge count
+    $vip_options      = get_option('nuru_options_settings', array());
+    $vip_excl_stored  = isset($vip_options['nuru_vip_exclusive']) ? $vip_options['nuru_vip_exclusive'] : '';
+    $vip_excl_count   = 0;
+    if (!empty($vip_excl_stored)) {
+        $vip_excl_count = count(array_filter(array_map('absint', explode(',', $vip_excl_stored))));
+    }
     ?>
     <div class="wrap nuru-options-wrap">
 
@@ -138,6 +199,7 @@ function nuru_schedule_page_content() {
               data-savebtn="#nuru-schedule-save">
             <?php wp_nonce_field('nuru_ajax_nonce', 'nuru_nonce'); ?>
 
+            <!-- Location slot cards -->
             <?php foreach ($locations as $loc): ?>
             <div class="nuru-location-card <?php echo esc_attr($loc['css']); ?>">
                 <div class="nuru-location-header">
@@ -158,6 +220,29 @@ function nuru_schedule_page_content() {
                 </div>
             </div>
             <?php endforeach; ?>
+
+            <!-- VIP Exclusive Goddesses card -->
+            <div class="nuru-location-card nuru-loc-vip nuru-vip-exclusive-card">
+                <div class="nuru-location-header">
+                    <div class="nuru-location-title-wrap">
+                        <h2 class="nuru-location-title">
+                            <span class="dashicons dashicons-star-filled nuru-vip-star"></span>
+                            VIP Exclusive Goddesses
+                            <?php if ($vip_excl_count > 0): ?>
+                                <span class="nuru-badge" style="font-size:.6em;vertical-align:middle;"><?php echo $vip_excl_count; ?></span>
+                            <?php endif; ?>
+                        </h2>
+                        <p class="nuru-location-desc">
+                            Goddesses exclusively available to Nuru VIP members — shown separately from the regular schedule.
+                        </p>
+                    </div>
+                </div>
+                <div class="nuru-location-body nuru-vip-exclusive-body">
+                    <table class="form-table nuru-form-table" role="presentation"><tbody>
+                        <?php do_settings_fields('nuru-options', 'nuru_options_section_vip_exclusive'); ?>
+                    </tbody></table>
+                </div>
+            </div>
 
         </form>
     </div>
