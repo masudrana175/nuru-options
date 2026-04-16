@@ -47,12 +47,24 @@ function nuru_schedule_days_group_callback($args) {
     $slot_display = $args['slot_display'];
     $days_labels  = array('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday');
 
+    // Count total unique goddess selections across all 7 days for this slot
+    $option_data   = get_option('nuru_options_settings', array());
+    $total_count   = 0;
+    foreach (array_keys($days_labels) as $day_index) {
+        $fid = $args['location'] . '_' . $args['slot_slug'] . '_day' . $day_index;
+        if (!empty($option_data[$fid])) {
+            $total_count += count(array_filter(explode(',', $option_data[$fid])));
+        }
+    }
     ?>
     <div class="nuru-collapsible">
         <button type="button" class="nuru-collapsible-header">
             <span class="nuru-slot-label">
                 <span class="dashicons dashicons-clock nuru-slot-icon"></span>
                 <?php echo esc_html($slot_display); ?>
+                <?php if ($total_count > 0): ?>
+                    <span class="nuru-badge"><?php echo $total_count; ?></span>
+                <?php endif; ?>
             </span>
             <span class="nuru-chevron dashicons dashicons-arrow-down-alt2"></span>
         </button>

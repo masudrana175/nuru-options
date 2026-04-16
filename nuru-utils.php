@@ -140,6 +140,7 @@ function nuru_options_select2_field_callback($args) {
         <?php
     } else {
         // ---- Who's on Now slot — collapsible ----
+        $has_selection = !empty($selected_ids_array);
         ?>
         <div class="nuru-slot-item nuru-collapsible">
             <button type="button" class="nuru-collapsible-header">
